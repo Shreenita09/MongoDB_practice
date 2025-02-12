@@ -1,114 +1,173 @@
-# MongoDB_practice
--- Create and use databases
-CREATE DATABASE Practice1;
-USE Practice1;
+Week 1
 
-CREATE TABLE Mech (
-    s_id INT,
-    s_name VARCHAR(25)
-);
+1. Operators:
 
-CREATE DATABASE ORG123;
-USE ORG123;
+CREATE DATABASE practise;
+USE practise;
 
 CREATE TABLE Worker (
     WORKER_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     FIRST_NAME CHAR(25),
     LAST_NAME CHAR(25),
-    SALARY INT(15),
+    SALARY INT,
     JOINING_DATE DATETIME,
     DEPARTMENT CHAR(25)
 );
 
--- Insert Data
-INSERT INTO Mech VALUES (101, 'Jayanth'), (103, 'Karthick');
+INSERT INTO Worker 
+    (WORKER_ID, FIRST_NAME, LAST_NAME, SALARY, JOINING_DATE, DEPARTMENT) VALUES
+    (1, 'Monika', 'Arora', 100000, '2014-02-20 09:00:00', 'HR'),
+    (2, 'Niharika', 'Verma', 80000, '2014-06-11 09:00:00', 'Admin'),
+    (3, 'Vishal', 'Singhal', 300000, '2014-02-20 09:00:00', 'HR'),
+    (4, 'Amitabh', 'Singh', 500000, '2014-02-20 09:00:00', 'Admin'),
+    (5, 'Vivek', 'Bhati', 500000, '2014-06-11 09:00:00', 'Admin'),
+    (6, 'Vipul', 'Diwan', 200000, '2014-06-11 09:00:00', 'Account'),
+    (7, 'Satish', 'Kumar', 75000, '2014-01-20 09:00:00', 'Account'),
+    (8, 'Geetika', 'Chauhan', 90000, '2014-04-11 09:00:00', 'Admin');
+    
+select * from Worker;
 
-INSERT INTO Worker (WORKER_ID, FIRST_NAME, LAST_NAME, SALARY, JOINING_DATE, DEPARTMENT) 
-VALUES
-    (001, 'Monika', 'Arora', 100000, '2014-02-20 09:00:00', 'HR'),
-    (002, 'Niharika', 'Verma', 80000, '2014-06-11 09:00:00', 'Admin'),
-    (003, 'Vishal', 'Singhal', 300000, '2014-02-20 09:00:00', 'HR'),
-    (004, 'Amitabh', 'Singh', 500000, '2014-02-20 09:00:00', 'Admin'),
-    (005, 'Vivek', 'Bhati', 500000, '2014-06-11 09:00:00', 'Admin'),
-    (006, 'Vipul', 'Diwan', 200000, '2014-06-11 09:00:00', 'Account'),
-    (007, 'Satish', 'Kumar', 75000, '2014-01-20 09:00:00', 'Account'),
-    (008, 'Geetika', 'Chauhan', 90000, '2014-04-11 09:00:00', 'Admin');
+SELECT * FROM Worker WHERE SALARY=100000 AND DEPARTMENT ='HR';
 
--- View Tables
-SELECT * FROM Mech;
-SELECT * FROM Worker;
-
--- Filtering
 SELECT * FROM Worker WHERE SALARY > 200000;
-SELECT * FROM Worker WHERE DEPARTMENT = 'HR';
-SELECT * FROM Worker WHERE LAST_NAME LIKE 'S%';
-SELECT * FROM Worker WHERE JOINING_DATE BETWEEN '2014-01-01' AND '2014-12-31';
 
--- Sorting
-SELECT * FROM Worker ORDER BY SALARY DESC;
-SELECT * FROM Worker ORDER BY FIRST_NAME ASC, LAST_NAME DESC;
+SELECT * FROM Worker WHERE SALARY=100000 AND DEPARTMENT = 'HR';
 
--- Grouping & Aggregates
-SELECT DEPARTMENT, AVG(SALARY) AS Avg_Salary FROM Worker GROUP BY DEPARTMENT;
-SELECT DEPARTMENT, COUNT(WORKER_ID) AS Total_Workers FROM Worker GROUP BY DEPARTMENT HAVING COUNT(WORKER_ID) > 2;
+SELECT * FROM Worker WHERE SALARY between 100000 AND 200000;
 
--- CASE Statement
-SELECT WORKER_ID, FIRST_NAME, DEPARTMENT,
-    CASE
-        WHEN SALARY > 300000 THEN 'Rich People'
-        WHEN SALARY BETWEEN 100000 AND 300000 THEN 'Middle Stage'
-        ELSE 'Poor People'
-    END AS People_Stage
+SELECT * FROM Worker WHERE SALARY not between 100000 AND 200000;
+
+SELECT * FROM worker
+WHERE SALARY BETWEEN 200000 AND 400000
+AND WORKER_ID in (1,2,3);
+
+desc worker;
+
+SELECT * FROM Worker 
+WHERE DEPARTMENT = 'HR' 
+ORDER BY SALARY ASC;
+
+
+SELECT FIRST_NAME, LAST_NAME  
+FROM Worker  
+WHERE DEPARTMENT = 'HR'  
+AND SALARY = (SELECT MIN(SALARY) FROM Worker WHERE DEPARTMENT = 'HR');
+
+SELECT DEPARTMENT, FIRST_NAME, LAST_NAME, SALARY
+FROM Worker w
+WHERE SALARY = (
+    SELECT MAX(SALARY) 
+    FROM Worker 
+    WHERE DEPARTMENT = w.DEPARTMENT
+);
+
+SELECT COUNT(*) AS Total_Workers
 FROM Worker;
 
--- Additional CASE Example
-SELECT FIRST_NAME, SALARY,
-    CASE
-        WHEN SALARY > 400000 THEN 'High Salary'
-        WHEN SALARY BETWEEN 200000 AND 400000 THEN 'Moderate Salary'
-        ELSE 'Low Salary'
-    END AS Salary_Category
+SELECT COUNT(*) AS HR_Workers
+FROM Worker
+WHERE DEPARTMENT = 'HR';
+
+SELECT AVG(SALARY) AS Average_Salary
 FROM Worker;
 
--- Views
-CREATE VIEW Worker_View AS 
-SELECT WORKER_ID, FIRST_NAME, LAST_NAME, SALARY, DEPARTMENT 
-FROM Worker WHERE SALARY > 100000;
-SELECT * FROM Worker_View;
+SELECT AVG(SALARY) AS Admin_Avg_Salary
+FROM Worker
+WHERE DEPARTMENT = 'Admin';
 
--- Subqueries
-SELECT FIRST_NAME, SALARY FROM Worker 
-WHERE SALARY > (SELECT AVG(SALARY) FROM Worker);
+SELECT SUM(SALARY) AS Total_Salary
+FROM Worker;
 
-SELECT FIRST_NAME, DEPARTMENT FROM Worker 
-WHERE DEPARTMENT IN (SELECT DISTINCT DEPARTMENT FROM Worker WHERE SALARY > 150000);
+SELECT SUM(SALARY) AS HR_Total_Salary
+FROM Worker
+WHERE DEPARTMENT = 'HR';
 
--- IN and EXISTS
-SELECT * FROM Worker WHERE DEPARTMENT IN ('HR', 'Admin');
-SELECT * FROM Worker WHERE EXISTS 
-(SELECT 1 FROM Mech WHERE Mech.s_id = Worker.WORKER_ID);
+SELECT * FROM Worker
+WHERE (DEPARTMENT = 'Admin' OR DEPARTMENT = 'Account')
+and SALARY = (SELECT MIN(SALARY) FROM Worker WHERE Salary = (SELECT MIN(SALARY) FROM Worker WHERE DEPARTMENT in ('Admin','Account'))
+);
 
--- LIMIT and OFFSET
-SELECT * FROM Worker ORDER BY SALARY DESC LIMIT 5;
-SELECT * FROM Worker ORDER BY SALARY DESC LIMIT 5 OFFSET 3;
 
--- UNION and UNION ALL
-SELECT FIRST_NAME, SALARY FROM Worker WHERE SALARY > 100000
-UNION
-SELECT FIRST_NAME, SALARY FROM Worker WHERE DEPARTMENT = 'Admin';
 
-SELECT FIRST_NAME FROM Worker WHERE DEPARTMENT = 'HR'
-UNION ALL
-SELECT FIRST_NAME FROM Worker WHERE SALARY > 200000;
+2. Savepoint-Commit
 
--- Indexing
-CREATE INDEX idx_salary ON Worker(SALARY);
-CREATE INDEX idx_department ON Worker(DEPARTMENT);
+show databases;
 
--- Finding Department with Highest and Lowest Employees
+create database practise;
+
+use practise;
+
+show tables;
+
+CREATE TABLE Mech (
+    s_id INT, 
+    s_name VARCHAR(25)
+);
+
+START TRANSACTION;
+
+    INSERT INTO Mech VALUES (101, 'Jayanth');
+    SAVEPOINT A;
+    
+    UPDATE Mech SET s_id = 102 WHERE s_id = 101;
+    SAVEPOINT B;
+    
+    INSERT INTO Mech VALUES (103, 'Karthick');
+    SAVEPOINT C;
+    
+    SELECT * FROM Mech;
+    
+    ROLLBACK TO SAVEPOINT B;
+    
+    SELECT * FROM Mech;
+    
+COMMIT;
+
+SET SQL_SAFE_UPDATES = 1;
+
+
+
+
+Week 2
+
+1. Case Statement:
+	
+show databases;
+
+use practise;
+
+select * from worker;
+
+SELECT worker_id, first_name,department,
+CASE
+    WHEN salary > 300000 THEN 'Rich people'
+    WHEN salary <=300000 && salary >=100000 THEN 'Middle stage'
+    ELSE 'Poor people'
+END 
+AS People_stage_wise 
+from worker;
+
+
+2. order by-group by:
+
+show databases;
+
+use practise;
+
+select * from worker where department = 'Admin' order by department desc;
+
+select * from worker where department = 'Admin' order by department desc limit 3;
+
+select department, count(DEPARTMENT) as total_employees  from worker 
+where department = 'HR' or DEPARTMENT='account' group by department;
+
+select department, count(department) as total_employees from worker
+group by department
+order by total_employees desc Limit 2;
+
 (
   SELECT department, COUNT(department) AS total_employees
-  FROM Worker
+  FROM worker
   GROUP BY department
   ORDER BY total_employees ASC
   LIMIT 1
@@ -118,15 +177,168 @@ UNION ALL
 
 (
   SELECT department, COUNT(department) AS total_employees
-  FROM Worker
+  FROM worker
   GROUP BY department
   ORDER BY total_employees DESC
   LIMIT 1
 );
 
--- Deleting Data & Dropping Tables
-DELETE FROM Worker WHERE WORKER_ID = 2;
-DELETE FROM Worker WHERE SALARY < 90000;
-DROP TABLE Mech;
-DROP DATABASE Practice1;
 
+3. Not Null-Primary key:
+
+use practise;
+
+create table Persons (
+	ID int PRIMARY KEY not null,
+    first_name varchar(255) not null,
+    last_name varchar(255) not null,
+    Unique(ID)
+);
+
+desc persons;
+
+4. Cascade:
+use practise;
+
+create table category(
+c_id int primary key,
+c_name varchar(25) not null unique,
+c_decrp varchar(250) not null
+);
+
+insert into category values (101, 'electronics', 'it stores all set of electronics items');
+select * from category;
+desc category;
+
+CREATE TABLE Products (
+    P_ID int primary key,
+    p_Name varchar(250) NOT NULL,
+    c_id int ,
+    CONSTRAINT c_id FOREIGN KEY (c_id)
+    REFERENCES category(c_id) on delete cascade
+);
+
+insert into products values (904, 'INTEL I5 Processor', 101);
+select * from products;
+
+delete from category where c_id=101;
+select * from category;
+
+select * from worker;
+
+CREATE TABLE Bonus (
+	WORKER_REF_ID INT,
+	BONUS_AMOUNT INT(10),
+	BONUS_DATE DATETIME,
+	FOREIGN KEY (WORKER_REF_ID)
+		REFERENCES Worker(WORKER_ID)
+        ON DELETE CASCADE
+);
+
+INSERT INTO Bonus 
+	(WORKER_REF_ID, BONUS_AMOUNT, BONUS_DATE) VALUES
+		(001, 5000, '16-02-20'),
+		(002, 3000, '16-06-11'),
+		(003, 4000, '16-02-20'),
+		(001, 4500, '16-02-20'),
+		(002, 3500, '16-06-11');
+        
+SELECT department, COUNT(*) AS department_count
+FROM worker
+GROUP BY department
+ORDER BY department_count DESC
+LIMIT 1 OFFSET 1;
+
+(SELECT * FROM Worker ORDER BY worker_ID DESC LIMIT 5)
+ORDER BY worker_ID ASC;
+
+desc worker;
+
+CREATE TABLE Title (
+	WORKER_REF_ID INT,
+	WORKER_TITLE CHAR(25),
+	AFFECTED_FROM DATETIME,
+	FOREIGN KEY (WORKER_REF_ID)
+		REFERENCES Worker(WORKER_ID)
+        ON DELETE CASCADE
+);
+
+
+INSERT INTO Title (WORKER_REF_ID, WORKER_TITLE, AFFECTED_FROM) 
+VALUES
+ (1, 'Manager', '2016-02-20 00:00:00'),
+ (2, 'Executive', '2016-06-11 00:00:00'),
+ (8, 'Executive', '2016-06-11 00:00:00'),
+ (5, 'Manager', '2016-06-11 00:00:00'),
+ (4, 'Asst. Manager', '2016-06-11 00:00:00'),
+ (7, 'Executive', '2016-06-11 00:00:00'),
+ (6, 'Lead', '2016-06-11 00:00:00'),
+ (3, 'Lead', '2016-06-11 00:00:00');
+
+
+
+
+Week 3
+
+1. Having Clause:
+2. Joints:
+use practise;
+
+create table student(
+s_id int primary key,
+s_name varchar(25) not null,
+s_department varchar(25) not null
+);
+
+insert into student values (1001,"Jayanth","ECE"),(1002,"Praveen","CSE"),(1003,"Logesh","Mech"),(1006,'karthick','Aero'),(1007,"Mahesh","Civil");
+
+select * from student;
+
+drop table vit;
+
+create table VIT(
+s_id int primary key,
+s_cgpa varchar(5) not null
+);
+
+insert into vit values (1001,'7.2'),(1002,'8.6'),(1007,'9.25');
+
+select * from vit;
+
+select * from student cross join vit;
+
+SELECT student.s_id, student.s_name, student.s_department, vit.s_cgpa
+FROM student 
+INNER JOIN vit 
+ON student.s_id = vit.s_id;
+
+SELECT student.s_id, student.s_name, student.s_department, vit.s_cgpa
+FROM student 
+LEFT JOIN vit 
+ON student.s_id = vit.s_id;
+
+SELECT student.s_id, student.s_name, student.s_department, vit.s_cgpa
+FROM student
+RIGHT JOIN vit ON student.s_id = vit.s_id;
+
+SELECT student.s_id, student.s_name, student.s_department, vit.s_cgpa
+FROM student
+FULL JOIN vit ON student.s_id = vit.s_id;
+
+
+show tables;
+
+select * from worker;
+
+select * from title;
+
+select * from worker
+INNER JOIN title on worker.WORKER_ID=title.WORKER_REF_ID
+where title.worker_title="manager";
+
+
+
+
+
+
+    
