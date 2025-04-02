@@ -1,0 +1,95 @@
+DB test
+db.sales.insertMany([
+	{ "_id" : 1, "item" : "Americanos", "price" : 5, "size": "Short", "quantity" : 22, "date" : ISODate("2022-01-15T08:00:00Z") },
+	{ "_id" : 2, "item" : "Cappuccino", "price" : 6, "size": "Short","quantity" : 12, "date" : ISODate("2022-01-16T09:00:00Z") },
+	{ "_id" : 3, "item" : "Lattes", "price" : 15, "size": "Grande","quantity" : 25, "date" : ISODate("2022-01-16T09:05:00Z") },
+	{ "_id" : 4, "item" : "Mochas", "price" : 25,"size": "Tall", "quantity" : 11, "date" : ISODate("2022-02-17T08:00:00Z") },
+	{ "_id" : 5, "item" : "Americanos", "price" : 10, "size": "Grande","quantity" : 12, "date" : ISODate("2022-02-18T21:06:00Z") },
+	{ "_id" : 6, "item" : "Cappuccino", "price" : 7, "size": "Tall","quantity" : 20, "date" : ISODate("2022-02-20T10:07:00Z") },
+	{ "_id" : 7, "item" : "Lattes", "price" : 25,"size": "Tall", "quantity" : 30, "date" : ISODate("2022-02-21T10:08:00Z") },
+	{ "_id" : 8, "item" : "Americanos", "price" : 10, "size": "Grande","quantity" : 21, "date" : ISODate("2022-02-22T14:09:00Z") },
+	{ "_id" : 9, "item" : "Cappuccino", "price" : 10, "size": "Grande","quantity" : 17, "date" : ISODate("2022-02-23T14:09:00Z") },
+	{ "_id" : 10, "item" : "Americanos", "price" : 8, "size": "Tall","quantity" : 15, "date" : ISODate("2022-02-25T14:09:00Z")}
+]);
+
+1.
+db.sales.find({ item: "Mochas" })
+
+2.
+db.sales.find({ price: { $lt: 15 } })
+
+3.
+db.sales.find({ 
+    $or: [ 
+        { price: { $lt: 10 } }, 
+        { price: { $gt: 20 } } 
+    ] 
+})
+
+4.
+db.sales.find({ quantity: { $exists: true } })
+
+12. 
+db.sales.find({}, { _id: 0, size: 1 })
+
+13.
+db.sales.aggregate([
+    { $match: { size: "Tall" } }, // Filter only Tall size items
+    { $group: { _id: "$item", totalQuantity: { $sum: "$quantity" } } } // Group by item and sum quantity
+])
+
+15. 
+db.sales.aggregate([
+    {
+        $group: {
+            _id: "$item",  // Group by item name
+            totalQuantity: { $sum: "$quantity" },  // Calculate total quantity
+            avgPrice: { $avg: "$price" }  // Calculate average price
+        }
+    }
+])
+
+
+db.products.insertMany([
+    { "_id" : 1, "name" : "xPhone", "price" : 799, "releaseDate": ISODate("2011-05-14"), "spec" : { "ram" : 4, "screen" : 6.5, "cpu" : 2.66 },"color":["white","black"],"storage":[64,128,256]},
+    { "_id" : 2, "name" : "xTablet", "price" : 899, "releaseDate": ISODate("2011-09-01") , "spec" : { "ram" : 16, "screen" : 9.5, "cpu" : 3.66 },"color":["white","black","purple"],"storage":[128,256,512]},
+    { "_id" : 3, "name" : "SmartTablet", "price" : 899, "releaseDate": ISODate("2015-01-14"), "spec" : { "ram" : 12, "screen" : 9.7, "cpu" : 3.66 },"color":["blue"],"storage":[16,64,128]},
+    { "_id" : 4, "name" : "SmartPad", "price" : 699, "releaseDate": ISODate("2020-05-14"),"spec" : { "ram" : 8, "screen" : 9.7, "cpu" : 1.66 },"color":["white","orange","gold","gray"],"storage":[128,256,1024]},
+    { "_id" : 5, "name" : "SmartPhone", "price" : 599,"releaseDate": ISODate("2022-09-14"), "spec" : { "ram" : 4, "screen" : 9.7, "cpu" : 1.66 },"color":["white","orange","gold","gray"],"storage":[128,256]}
+ ])
+
+
+5.
+db.products.find({ color: "white" })
+
+6.
+db.products.updateOne(
+    { name: "xTablet" }, 
+    { $set: { "spec.ram": 24 } }
+)
+
+7.
+db.products.find({}, { _id: 0, spec: 1 })
+
+8.
+db.products.find().sort({ price: -1 })
+
+9.
+db.products.find().skip(1).limit(2)
+
+10.
+db.products.find({
+    name: { $regex: /^S/, $options: "i" },
+    price: { $gt: 700 }
+})
+
+11.
+db.products.aggregate([
+    { $group: { _id: null, totalPrice: { $sum: "$price" } } }
+])
+
+14.
+db.sales.aggregate([
+    { $match: { size: "Tall" } }, // Filter only Tall size items
+    { $group: { _id: "$item", totalQuantity: { $sum: "$quantity" } } } // Group by item and sum quantity
+])
