@@ -1,0 +1,155 @@
+FEB 2nd WEEK
+
+show databases;
+use org123;
+
+create table Student(
+sno int primary key,
+sname varchar(20),
+age int
+);
+
+insert into Student(sno,sname,age)
+values (1,'Ankit',17),
+(2,'Ramya',18),
+(3,'Ram',16);
+
+create table Course(
+cno int primary key,
+cname varchar(20)
+);
+
+select from Course;
+insert into Course(cno,cname)
+values(101,'c'),
+(102,'c++'),
+(103,'DBMS');
+
+create table Enroll(
+sno int,
+cno int,
+jdate date,
+primary key (sno,cno),
+foreign key(cno)
+	references Course(cno)
+	on delete cascade
+);
+
+insert into Enroll (sno,cno,jdate)
+value (2,105,"2022/05/05");
+
+select * from enroll;
+desc enroll;
+
+
+----------------------------------------
+CREATE TABLE Persons{
+  ID int NOT NULL,
+  LastName varchar(255) NOT NULL,
+  FirstName varchar(255),
+  Age int,
+  CHECK (salary>=200000 and salar <= 400000)
+);
+
+ALTER TABLE Persons
+ADD CHECK (Age >= 18);
+
+CREATE TABLE Persons1 (
+  ID int NOT NULL,
+  LastName varchar(255) NOT NULL,
+  FirstName varchar(255),
+  Age int,
+  City varchar(255) DEFAULT 'Coimbatore'
+);
+
+desc persons1;
+
+use org123;
+show table from org123;
+
+select * from worker;
+
+SELECT * FROM worker WHERE first_name LIKE '_i_a%';
+
+SELECT * FROM worker WHERE salary LIKE '8%';
+
+create view admin_more_salary as
+select * from worker 
+where departe = 'Admin' and salary >= 100000 order by salary desc;
+
+
+select * from admin_more_salary;
+--------------------------------------
+use org123
+select * from worker
+select department, count(department) from worker 
+where department in ('admin', 'account') group by department;
+
+SELECT column_name(s)
+FROM table_name
+WHERE condition
+GROUP BY column_name(s)
+HAVING condition
+ORDER BY column_name(s);
+
+SELECT department, count(department) as highest_head_count
+FROM worker
+GROUP BY department
+HAVING COUNT (department) >= 3;
+
+
+create table vitBhopal (id int primary key, name varchar(20) not null,
+  departement varchar(25) not null);
+insert into vitBhopal values(104,'Shubham','cs'),(103,'Anjali','BEd');
+
+create table vit (id int primary key, name varchar(20) not null,
+  departement varchar(25) not null);
+insert into vit values(104,'Shubham','Samastipur'),(103,'Anjali','Vidyapati');
+
+select * from vit;
+select * from vitBhopal;
+
+select name as WinnerOfTheYear from vitBhopal 
+  where id = (select id from vit where college = 'bhopal');
+
+
+
+  --------------------------------------
+use org123;
+
+create table student(
+  s_id int primary key,
+  s_name varchar(25) not null,
+  s_department varchar(25) not null
+  );
+
+insert into student values (1001, "Shubham","CSE"),(1002,"Joy","CSE"),(1003,"Ujjwal","CSE");
+
+select * from student;
+
+
+create table VIT(
+  s_id int primary key,
+  s_cgpa varchar(5) not null
+  );
+
+insert into vit values (1001,'8.2'),(1003,'8.5'),(1007,'9.5');
+select * from vit;
+
+use org123;
+
+select * from student cross join vit;
+
+select * from student INNER JOIN vit where student.s_id = vit.s_id;
+
+
+select * from student NATURAL JOIN vit where student.s_id = vit.s_id;
+
+select * from student LEFT JOIN vit ON (student.s_id = vit.s_id);
+
+select * from student RIGHT JOIN vit ON (student.s_id = vit.s_id);
+
+select * from student full JOIN vit;
+
+select * from student FULL OUTER JOIN vit ON (student.s_id = vit.s_id);
+-----------------------------------
